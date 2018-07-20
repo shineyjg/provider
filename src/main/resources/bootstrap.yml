@@ -1,0 +1,45 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+  application:
+      name: provider
+---
+spring:
+  profiles: test
+  cloud:
+    consul:
+      enabled: false
+---
+spring:
+  profiles: dev
+  cloud:
+    consul:
+      enabled: true
+      host: ${CONSUL_HOST:127.0.0.1}
+      port: 8500
+      ribbon:
+        enabled: true
+      discovery:
+        enabled: true
+        register: true
+        prefer-ip-address: true
+        instance_id: ${spring.application.name}:${spring.application.instance_id:${random.value}}:${server.port}
+        tags: DeployTag=test
+---
+spring:
+  profiles: prod
+  cloud:
+    consul:
+      enabled: true
+      host: ${CONSUL_HOST:127.0.0.1}
+      port: 8500
+      ribbon:
+        enabled: true
+      discovery:
+        enabled: true
+        register: true
+        prefer-ip-address: true
+        instance_id: ${spring.application.name}:${spring.application.instance_id:${random.value}}:${server.port}
